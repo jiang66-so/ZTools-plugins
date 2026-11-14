@@ -54,6 +54,15 @@ test('展开收起复用窗口布局且不广播入口全集；重复展开无�
   f.controller.dispose();
 });
 
+test('云母与亚克力切换立即恢复已有布局，不依赖隐藏渲染器重新上报',()=>{
+ const f=fixture(false,{materialsSupported:true}),c=defaults();c.settings.material='mica';f.controller.save(c);f.controller.expand();
+ const rects=[{x:100,y:0,width:200,height:66},{x:40,y:66,width:392,height:220}];f.controller.panelLayout(rects);
+ c.settings.material='acrylic';f.controller.save(c);
+ const live=f.wins.filter(w=>!w.gone&&w.url.startsWith('material.html'));assert.equal(live.length,2);assert.ok(live.every(w=>w.visible));assert.equal(live[1].bounds.width,392);
+ f.controller.pin();f.controller.collapse(false);c.settings.material='mica';f.controller.save(c);
+ const latest=f.wins.filter(w=>!w.gone&&w.url.startsWith('material.html'));assert.equal(latest[0].visible,true);assert.equal(latest[1].visible,false);f.controller.dispose();
+});
+
 test('重置只恢复外观行为，保留自定义分类入口顺序、启用状态和最后分类', () => {
   const f=fixture(), custom=defaults();
   custom.categories.push({id:'custom',name:'我的分类',icon:'Folder',color:'#123456'});

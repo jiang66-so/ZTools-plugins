@@ -14,6 +14,8 @@ import { checkCardScale } from './check-card-scale.mjs';
 import { checkPinAdaptive } from './check-pin-adaptive.mjs';
 import { checkNames } from './check-names.mjs';
 import { checkPosition } from './check-position.mjs';
+import { checkDockDimensions } from './check-dock-dimensions.mjs';
+import { checkSettingsLayout } from './check-settings-layout.mjs';
 import { checkAppearance } from './check-appearance.mjs';
 import { checkReset } from './check-reset.mjs';
 
@@ -122,6 +124,8 @@ try {
   check('native trigger region clipped; hover panel does not steal focus');
   await checkTriggerArt({app,evaluate,screenshot,native,temp,check});
   await checkAppearance({app,evaluate,screenshot,native,check});
+  await checkDockDimensions({app,evaluate,screenshot,check});
+  await checkSettingsLayout({app,evaluate,screenshot,check});
   await checkPosition({app,evaluate,screenshot,native,check});
   if(!await checkCompositor({app,evaluate,native,check}))evidence.blockedChecks=['Windows locked or material unsupported: compositor check unavailable'];
   await checkCardScale({app,evaluate,screenshot,check});

@@ -109,12 +109,21 @@ function createController(api, options = {}) {
       trigger.showInactive(); maintainTopmost();
     }
     const material = effectiveMaterial();
+    const previousMaterial = panelMaterial;
     panelMaterial = material;
     if (!live(panel)) {
       panel = api.createBrowserWindow('index.html?surface=panel', { ...common, ...bounds.panel, transparent: true, backgroundColor: '#00000000', hasShadow: false });
       resetPanelShape();
     }
-    if (materialSurfaces.setMaterial(material,common)) { panelRegions=[];lastPanelShape=''; }
+    if (materialSurfaces.setMaterial(material,common)) {
+      // Native-to-native switches have identical geometry. Restore backgrounds now,
+      // even when the renderer is hidden/throttled and cannot report a new layout yet.
+      if (previousMaterial !== 'solid' && material !== 'solid') {
+        materialSurfaces.layout(panelRegions, bounds.panel, expanded, trayVisible);
+        maintainTopmost();
+      } else panelRegions=[];
+      lastPanelShape='';
+    }
     if (topmostTimer === null) topmostTimer = timers.setInterval(() => {
       try {
         maintainTopmost();

@@ -28,8 +28,9 @@ export async function checkAppearance({app,evaluate,screenshot,native,check}) {
   await expect.poll(()=>evaluate('(()=>{const c=document.querySelector(".launch-card").getBoundingClientRect(),i=document.querySelector(".launch-icon").getBoundingClientRect(),n=document.querySelector(".launch-name").getBoundingClientRect();return i.top>=c.top && n.bottom<=c.bottom})()','panel')).toBe(true);
   check('real 50/100/150 percent slider scales whole card width/height and tray together; text remains inside minimum-height cards');
   if((await evaluate('window.dock.call("snapshot")')).materialsSupported) {
-   for(const [material,code] of [['mica',2],['acrylic',3]]) {
-    await evaluate(`(()=>{const s=document.querySelector('[aria-label="面板材质"]');s.value='${material}';s.dispatchEvent(new Event('change',{bubbles:true}))})()`);
+   for(const [material,code] of [['mica',2],['acrylic',3],['mica',2],['acrylic',3]]) {
+    const settingsPage=app.windows().find(page=>page.url().includes('surface=settings'));
+    await settingsPage.locator(`[data-material="${material}"]`).click();
     await expect.poll(()=>evaluate('window.dock.call("snapshot").then(s=>s.material)')).toBe(material);
     await expect.poll(()=>evaluate('Boolean(document.querySelector(".dock-panel.material-native"))','panel').catch(()=>false)).toBe(true);
     await evaluate('window.dock.call("expand")');
